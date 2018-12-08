@@ -182,7 +182,11 @@ class ConvBLSTM(nn.Module):
         y_out_fwd, _ = self.forward_net(xforward)
         y_out_rev, _ = self.reverse_net(xreverse)
 
-        ycat = torch.cat((y_out_fwd[-1], y_out_rev[-1]), dim=2)
+        y_out_fwd = y_out_fwd[-1] # output of last CLSTM layer = B, T, C, H, W
+        y_out_rev = y_out_rev[-1] # output of last CLSTM layer = B, T, C, H, W
+        y_out_rev = y_out_rev[:, [2,1,0], ...] # reverse temporal outputs.
+        ycat = torch.cat((y_out_fwd, y_out_rev), dim=2)
+        
         return ycat
 
 
