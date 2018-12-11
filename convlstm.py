@@ -171,19 +171,16 @@ class ConvBLSTM(nn.Module):
         self.reverse_net = ConvLSTM(in_channels, hidden_channels/2, kernel_size,
                                     num_layers, batch_first=batch_first, bias=bias)
         
-    def forward(self, x1, x2, x3):
-        x1 = torch.unsqueeze(x1, dim=1)
-        x2 = torch.unsqueeze(x2, dim=1)
-        x3 = torch.unsqueeze(x3, dim=1)
-
-        xforward = torch.cat((x1, x2, x3), dim=1)
-        xreverse = torch.cat((x3, x2, x1), dim=1)
+    def forward(self, xforward, xreverse):
+        """
+        xforward, xreverse = B T C H W tensors.
+        """
 
         y_out_fwd, _ = self.forward_net(xforward)
         y_out_rev, _ = self.reverse_net(xreverse)
 
-        y_out_fwd = y_out_fwd[-1] # output of last CLSTM layer = B, T, C, H, W
-        y_out_rev = y_out_rev[-1] # output of last CLSTM layer = B, T, C, H, W
+        y_out_fwd = y_out_fwd[-1] # outputs of last CLSTM layer = B, T, C, H, W
+        y_out_rev = y_out_rev[-1] # outputs of last CLSTM layer = B, T, C, H, W
         y_out_rev = y_out_rev[:, [2,1,0], ...] # reverse temporal outputs.
         ycat = torch.cat((y_out_fwd, y_out_rev), dim=2)
         
