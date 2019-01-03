@@ -166,9 +166,9 @@ class ConvBLSTM(nn.Module):
                  kernel_size, num_layers, bias=True, batch_first=False):
 
         super(ConvBLSTM, self).__init__()
-        self.forward_net = ConvLSTM(in_channels, hidden_channels/2, kernel_size,
+        self.forward_net = ConvLSTM(in_channels, hidden_channels//2, kernel_size,
                                     num_layers, batch_first=batch_first, bias=bias)
-        self.reverse_net = ConvLSTM(in_channels, hidden_channels/2, kernel_size,
+        self.reverse_net = ConvLSTM(in_channels, hidden_channels//2, kernel_size,
                                     num_layers, batch_first=batch_first, bias=bias)
         
     def forward(self, xforward, xreverse):
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     cblstm = ConvBLSTM(in_channels=32, hidden_channels=64, kernel_size=(3, 3), num_layers=1, batch_first=True).cuda()
 
     out = cblstm(x1, x2, x3)
-    print out.shape
+    print (out.shape)
 
 
 
