@@ -181,7 +181,9 @@ class ConvBLSTM(nn.Module):
 
         y_out_fwd = y_out_fwd[-1] # outputs of last CLSTM layer = B, T, C, H, W
         y_out_rev = y_out_rev[-1] # outputs of last CLSTM layer = B, T, C, H, W
-        y_out_rev = y_out_rev[:, [2,1,0], ...] # reverse temporal outputs.
+
+        reversed_idx = list(reversed(range(y_out_rev.shape[1])))
+        y_out_rev = y_out_rev[:, reversed_idx, ...] # reverse temporal outputs.
         ycat = torch.cat((y_out_fwd, y_out_rev), dim=2)
         
         return ycat
@@ -195,8 +197,12 @@ if __name__ == "__main__":
 
     cblstm = ConvBLSTM(in_channels=32, hidden_channels=64, kernel_size=(3, 3), num_layers=1, batch_first=True).cuda()
 
-    out = cblstm(x1, x2, x3)
+    x_fwd = torch.stack([x1, x2, x3], dim=1)
+    x_rev = torch.stack([x3, x2, x1], dim=1)
+
+    out = cblstm(x_fwd, x_rev)
     print (out.shape)
+    out.sum().backward()
 
 
 
